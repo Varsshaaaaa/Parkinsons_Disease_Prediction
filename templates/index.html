@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parkinson's Disease Prediction</title>
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: url('static/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            padding: 20px;
+        }
+        .dashboard {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .container {
+            width: 45%;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        #chart-container {
+            width: 45%;
+            padding: 20px;
+        }
+        h1 {
+            color: #f1c40f;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .custom-file-upload {
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #3498db;
+            color: white;
+            border-radius: 5px;
+            margin: 10px;
+        }
+        .custom-file-upload:hover {
+            background: #2980b9;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        button {
+            padding: 10px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #c0392b;
+        }
+        #result {
+            font-size: 18px;
+            color: #f1c40f;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid white;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧬 Parkinson's Disease Prediction</h1>
+    <div class="dashboard">
+        <div id="chart-container">
+            <canvas id="predictionChart"></canvas>
+        </div>
+        <div class="container">
+            <form id="upload-form" enctype="multipart/form-data">
+                <label for="file-upload" class="custom-file-upload">📂 Choose CSV File</label>
+                <input type="file" id="file-upload" name="file" accept=".csv">
+                <button type="submit">🔍 Predict</button>
+            </form>
+            <div id="result"></div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById("upload-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById("file-upload");
+            if (!fileInput.files.length) {
+                document.getElementById("result").innerHTML = "<p class='error'>❌ No file selected.</p>";
+                return;
+            }
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+            document.getElementById("result").innerHTML = "<p class='loading'>⏳ Processing...</p>";
+            
+            const response = await fetch("/predict", { method: "POST", body: formData });
+            const data = await response.json();
+            
+            if (data.error) {
+                document.getElementById("result").innerHTML = `<p class='error'>❌ Error: ${data.error}</p>`;
+                return;
+            }
+            
+            let predictions = data.predictions;
+            let total = predictions.length;
+            let positive = predictions.filter(p => p === 1).length;
+            let negative = total - positive;
+            
+            let resultHTML = `<p class='summary'>✅ Total Cases: ${total} | Positive: ${positive} | Negative: ${negative}</p>`;
+            resultHTML += `<table><tr><th>Patient ID</th><th>Prediction</th></tr>`;
+            predictions.forEach((pred, index) => {
+                resultHTML += `<tr><td>${index + 1}</td><td>${pred === 1 ? '🛑 Parkinson\'s' : '✔ Healthy'}</td></tr>`;
+            });
+            resultHTML += `</table>`;
+            document.getElementById("result").innerHTML = resultHTML;
+            
+            const ctx = document.getElementById('predictionChart').getContext('2d');
+            if (window.myChart) {
+                window.myChart.destroy();
+            }
+            window.myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Array.from({length: total}, (_, i) => `Patient ${i + 1}`),
+                    datasets: [{
+                        label: 'Parkinson\'s Prediction',
+                        data: predictions,
+                        backgroundColor: predictions.map(p => p === 1 ? 'rgba(231, 76, 60, 0.8)' : 'rgba(46, 204, 113, 0.8)'),
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                        hoverBackgroundColor: predictions.map(p => p === 1 ? '#c0392b' : '#27ae60')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#fff'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Patients',
+                                color: '#fff'
+                            },
+                            ticks: { color: '#fff' }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Prediction (1 = Parkinson\'s, 0 = Healthy)',
+                                color: '#fff'
+                            },
+                            ticks: {
+                                stepSize: 1,
+                                min: 0,
+                                max: 1,
+                                color: '#fff'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
