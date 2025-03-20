@@ -67,7 +67,7 @@ This project aims to predict Parkinson's disease using a hybrid deep learning an
 ---
 
 ## Model Performance
-- The hybrid model achieves an accuracy of **X%** (replace with actual test accuracy).
+- The hybrid model achieves an accuracy of **92.31%** (replace with actual test accuracy).
 - Feature extraction with LSTM helps in improving classification performance.
 
 ---
@@ -80,19 +80,13 @@ This project aims to predict Parkinson's disease using a hybrid deep learning an
 ---
 
 ## How to Run
-1. Install dependencies:  
-   ```sh
-   pip install -r requirements.txt
    ```
-2. Start the Flask app:  
+1. Start the Flask app:  
    ```sh
    python app.py
    ```
-3. Open `http://127.0.0.1:5000/` in a browser to upload a CSV and make predictions.
+2. Open `http://127.0.0.1:5000/` in a browser to upload a CSV and make predictions.
 
 ---
 
-## Author
-- **[Your Name]** (Replace with your actual name)
-- Contact: [Your Email] (Optional)
 
