@@ -1,4 +1,6 @@
 # Parkinson's Disease Prediction - Hybrid Model (LSTM + Random Forest)
+![image](https://github.com/user-attachments/assets/20d17057-575d-41e4-93d5-c2a37390548f)
+
 
 ## Overview
 This project aims to predict Parkinson's disease using a hybrid deep learning and machine learning approach. The system consists of an LSTM model for feature extraction and a Random Forest classifier for final predictions. A Flask-based web application is built to accept CSV files and return predictions.
@@ -76,16 +78,6 @@ This project aims to predict Parkinson's disease using a hybrid deep learning an
 - Fine-tune LSTM architecture for improved feature extraction.
 - Implement additional ensemble models to enhance predictive performance.
 - Deploy the Flask app as a production-ready web service.
-
----
-
-## How to Run
-   ```
-1. Start the Flask app:  
-   ```sh
-   python app.py
-   ```
-2. Open `http://127.0.0.1:5000/` in a browser to upload a CSV and make predictions.
 
 ---
 
